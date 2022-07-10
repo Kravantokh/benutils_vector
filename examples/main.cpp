@@ -1,4 +1,4 @@
-#include "benutils/matrix.hpp"
+#include "benutils/vector.hpp"
 #include <stdio.h>
 
 using bu::math::Vecn;
@@ -7,23 +7,40 @@ using bu::math::Vec3;
 using bu::math::Vec4;
 
 int main(int argc, char* argv[]){
-	Vec2 v;
-	printf("( %f, %f )", v[1], v[2]);
-	v[1] = 3;
-	v[2] = 6.42;
-	printf("( %f, %f )", v[1], v[2]);
-	Vec3 v2;
-	v2[1] = 1;
-	v2[2] = 0;
-	v2[3] = 0;
-	Vec3 v3;
-	v3[1] = 0;
-	v3[2] = 1;
-	v3[3] = 0;
-	printf("( %f, %f, %f )", v2[1], v2[2], v2[3]);
-	printf("( %f, %f, %f )", v3[1], v3[2], v3[3]);
-	Vec3 v4;
-	v4 = v2.cross(v3);
+	Vec2 a;
+	a[1] = 3;
+	a[2] = 4;
+	Vec2 b;
+	b[1] = 1;
+	b[2] = 2;
+	printf("Vectors: a = ( %f, %f ), b = ( %f, %f )\n", a[1], a[2], b[1], b[2]);
+	
+	// Addition, subtraction, unary minus operators are defined as any normal mathematician would expect.
+	Vec2 c = a + b;
+	printf("Sum of a and b: ( %f, %f )\n", c[1], c[2]);
+	c = a - b;
+	printf("Difference of a and b ( %f, %f )\n", c[1], c[2]);
+	c = -b;
+	printf("Opposite of b (-b): ( %f, %f )\n", c[1], c[2]);
 
-	printf("( %f, %f, %f )", v4[1], v4[2], v4[3]);
+	// The * operator is defined as the dot product.
+	double d = a * b;
+	printf("Dot product of a and b: %f\n", d);
+
+	Vec3 k;
+	k[1] = 1;
+	k[2] = 2;
+	k[3] = 3;
+	printf("%f %f %f \n", k[1], k[2], k[3]);
+	Vec2 l;
+	l[1] = 4;
+	l[2] = 5;
+	printf("%f %f \n", l[1], l[2]);
+	k = l;
+	printf("%f %f %f \n", k[1], k[2], k[3]);
+	k[1] = 1;
+	k[2] = 2;
+	k[3] = 3;
+	l = k;
+	printf("%f %f \n", l[1], l[2]);
 }
