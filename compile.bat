@@ -1,0 +1,1 @@
+g++ -Wall -fanalyzer ./examples/main.cpp -I include
