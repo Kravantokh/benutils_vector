@@ -3,7 +3,8 @@
 
 #include <array>
 #include <exception>
-
+#include <string>
+#include <initializer_list>
 
 #ifndef THROW_ON_ZERO_NORM
 #define THROW_ON_ZERO_NORM 0
@@ -23,7 +24,7 @@
 Vecn<1, T> A () {\
 	Vecn<1, T> ret;\
 	ret.contents[0] = this->contents[(B - 1)];\
-	static_assert(N >= B, "Bad assignment! You are trying to acces an inexistent member! (Index out of range.)");\
+	static_assert(N >= B, "Bad swizzling! You are trying to acces an inexistent member! (Index out of range.)");\
 	return ret;\
 }
 
@@ -33,7 +34,7 @@ Vecn<2, T> A##B () {\
 	Vecn<2, T> ret;\
 	ret.contents[0] = this->contents[(C)];\
 	ret.contents[1] = this->contents[(D)];\
-	static_assert(N >= C || N >= D, "Bad assignment! You are trying to acces an inexistent member! (Index out of range.)");\
+	static_assert(N >= C || N >= D, "Bad swizzling! You are trying to acces an inexistent member! (Index out of range.)");\
 	return ret;\
 }
 
@@ -43,7 +44,7 @@ Vecn<3, T> A##B##C () {\
 	ret.contents[0] = this->contents[(D)];\
 	ret.contents[1] = this->contents[(E)];\
 	ret.contents[2] = this->contents[(F)];\
-	static_assert(N >= D || N >= E || N >= F, "Bad assignment! You are trying to acces an inexistent member! (Index out of range.)");\
+	static_assert(N >= D || N >= E || N >= F, "Bad swizzling! You are trying to acces an inexistent member! (Index out of range.)");\
 	return ret;\
 }
 
@@ -54,7 +55,7 @@ Vecn<4, T> A##B##C##D () {\
 	ret.contents[1] = this->contents[(F)];\
 	ret.contents[2] = this->contents[(G)];\
 	ret.contents[4] = this->contents[(H)];\
-	static_assert(N >= E || N >= F || N >= G || N >= H, "Bad assignment! You are trying to acces an inexistent member! (Index out of range.)");\
+	static_assert(N >= E || N >= F || N >= G || N >= H, "Bad swizzling! You are trying to acces an inexistent member! (Index out of range.)");\
 	return ret;\
 }
 	
@@ -95,6 +96,14 @@ public:
 	std::array<T, N> contents;
 	
 	Vecn() = default;
+	
+	Vecn(std::initializer_list<T> list){
+		int i = 1;
+		for (auto element: list){
+			contents.at(i - 1) = element;
+			++i;
+		}
+	}
 
 	// Conversion constructor for promotion (converting from vector of smaller dimension to vector of greater dimension)
 	// Yes, a hack had to be used to make sure this conversion is used only for promotion and not demotion. (For future me and anyone who has no idea what this is: the char(*)[n] part declares a pointer to an array of n members. If M<N, n becomes 1, otherwise n is 0, which is invalid syntax (an array of length 0 make no sense) and thus template specialization fails, leaving the other, demotion conversion constructor to take its place)
@@ -118,19 +127,26 @@ public:
 	// Equality operator
 	bool operator==(const Vecn<N,T>& v) const{
 		bool eq = 1;
-		
-		for(int i = 1; i <= N; ++i){
-			if(this->contents.at(i-1) != v[i]){
+		for(int i = 1; i <= N && eq; ++i){
+			if(this->contents[i-1] != v[i])
 				eq = false;
-				break;
-			}
 		}
 
 		return eq;
 	}
 	
+	bool operator!=(const Vecn<N,T>& v) const{
+		bool eq = 1;
+		for(int i = 1; i <= N && eq; ++i){
+			if(this->contents[i-1] != v[i])
+				eq = false;
+		}
+
+		return !eq;
+	}
+	
 	// Element acces operator
-	T& operator[](unsigned int n){
+	T& operator[](unsigned int n) {
 		return contents.at(n - 1);
 	}
 	
@@ -197,7 +213,17 @@ public:
 		}
 		return;
 	}
-
+	
+	std::string to_str(){
+		std::string ret = "(";
+		ret.reserve(3*N);	
+		for(unsigned int i = 1; i < N; ++i)
+			ret += std::to_string(contents.at(i - 1)) + ", ";
+		
+		ret += std::to_string(contents.at(N - 1)) + ")"; 
+		
+		return ret;
+	}
 
 
 // Generated functions for accesing single elements
